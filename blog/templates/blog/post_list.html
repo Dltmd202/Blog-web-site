@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Blog</title>
     <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
     <script src="https://kit.fontawesome.com/4fee8270fa.js" crossorigin="anonymous"></script>
 </head>
@@ -63,9 +63,9 @@
 </div>
     <div class="container">
         <div class="row">
-            <div class ="col-md-8 col-lg-9">
+            <div class ="col-md-8 col-lg-9" id="main-area">
                 <h1>Blog</h1>
-
+                {% if post_list.exists %}
                 {% for p in post_list %}
                 <!-- Blog Post -->
                 <div class="card mb-4">
@@ -88,6 +88,9 @@
                     </div>
                 </div>
                 {% endfor %}
+                {% else %}
+                    <h3>아직 게시물이 없습니다.</h3>
+                {% endif %}
             </div>
             <div class="col-md-4 col-lg-3">
                 <div class="card my-4">
