@@ -8,5 +8,3 @@ urlpatterns = [
     path('', views.PostList.as_view()),
     path('<int:pk>/', views.PostDetail.as_view()),
 ]
-
-urlpatterns += static(settings.MEDIA_URL , document_root=settings.MEDIA_ROOT)
