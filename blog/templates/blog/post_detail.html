@@ -69,7 +69,11 @@
         <hr>
 
         <!-- Preview Image -->
+        {% if post.head_image %}
         <img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="">
+        {% else %}
+        <img class="card-img-top"  src="http://picsum.photos/seed/{{post.id}}/800/200" alt="random_image">
+        {% endif %}
 
         <hr>
 
