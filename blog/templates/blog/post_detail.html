@@ -1,238 +1,107 @@
+{% extends 'blog/base.html' %}
 
-<!DOCTYPE html>
-{% load static %}
-<html lang="ko">
+{% block head_title %}
+  {{ post.title }} - Blog
+{% endblock %}
 
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <title>{{ post.title }} - Blog</title>
-    <!-- Bootstrap core CSS -->
-    <link rel="stylesheet" href="{% static 'blog/bootstrap/bootstrap.min.css' %}" media="screen">
-    <!-- Custom styles for this template -->
-    <link href="{% static 'blog/css/blog-post.css' %}" rel="stylesheet" media="screen">
-      <script src="https://kit.fontawesome.com/4fee8270fa.js" crossorigin="anonymous"></script>
-</head>
+{% block main_area %}
 
-<body>
-  <!-- Navigation -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-    <div class="container">
-      <a class="navbar-brand" href="#">Start Bootstrap</a>
-      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarResponsive">
-        <ul class="navbar-nav ml-auto">
-          <li class="nav-item active">
-            <a class="nav-link" href="#">Home
-              <span class="sr-only">(current)</span>
-            </a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">About</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Services</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="#">Contact</a>
-          </li>
-        </ul>
-      </div>
+<div id="post-area">
+  <!-- Title -->
+  <h1 class="mt-4">{{ post.title }}</h1>
+  {% if post.hook_text %}
+  <h5 class="Text-muted">{{post.hook_text}}</h5>
+  {% endif %}
+
+  <!-- Author -->
+  <p class="lead">
+    by
+    <a href="#">작성자명 쓸 위치(개발예정)</a>
+  </p>
+
+  <hr>
+
+  <!-- Date/Time -->
+  <p>Posted on {{ post.created_at }}</p>
+
+  <hr>
+
+    <!-- Preview Image -->
+    {% if post.head_image %}
+    <img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="">
+    {% else %}
+    <img class="card-img-top"  src="http://picsum.photos/seed/{{post.id}}/800/200" alt="random_image">
+    {% endif %}
+
+    <p>{{ post.content }}</p>
+  <hr>
+</div>
+<div id="comment-area">
+  <!-- Post Content -->
+  {% if post.file_upload %}
+  <a href="{{ post.file_upload.url }}" class="btn btn-outline-dark" role="button">
+    Download:
+    {% if post.get_file_ext == 'csv' %}
+      <i class="fas fa-file-csv"></i>
+    {% elif post.file_ext == 'xlsx' or post.file_ext == 'xls' %}
+      <i class="fas fa-file-excel"></i>
+    {% elif post.file_ext == 'docx' or post.file_ext == 'doc' %}
+      <i class="fas fa-file-word"></i>
+    {% else %}
+      <i class="far fa-file"></i>
+    {% endif %}
+    {{ post.get_file_name }}
+  </a>
+  {% endif %}
+  <hr>
+
+  <!-- Comments Form -->
+  <div class="card my-4">
+    <h5 class="card-header">Leave a Comment:</h5>
+    <div class="card-body">
+      <form>
+        <div class="form-group">
+          <textarea class="form-control" rows="3"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </form>
     </div>
-  </nav>
-
-  <!-- Page Content -->
-  <div class="container">
-
-    <div class="row">
-
-      <!-- Post Content Column -->
-      <div class="col-lg-8">
-
-        <!-- Title -->
-        <h1 class="mt-4">{{ post.title }}</h1>
-        {% if post.hook_text %}
-        <h5 class="Text-muted">{{post.hook_text}}</h5>
-        {% endif %}
-
-        <!-- Author -->
-        <p class="lead">
-          by
-          <a href="#">작성자명 쓸 위치(개발예정)</a>
-        </p>
-
-        <hr>
-
-        <!-- Date/Time -->
-        <p>{{ post.created_at }}</p>
-
-        <hr>
-
-        <!-- Preview Image -->
-        {% if post.head_image %}
-        <img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="">
-        {% else %}
-        <img class="card-img-top"  src="http://picsum.photos/seed/{{post.id}}/800/200" alt="random_image">
-        {% endif %}
-
-        <hr>
-
-        <!-- Post Content -->
-          <p>{{ post.content }}</p>
-        {% if post.file_upload %}
-        <a href="{{ post.file_upload.url }}" class="btn btn-outline-dark" role="button">
-          Download:
-          {% if post.get_file_ext == 'csv' %}
-            <i class="fas fa-file-csv"></i>
-          {% elif post.file_ext == 'xlsx' or post.file_ext == 'xls' %}
-            <i class="fas fa-file-excel"></i>
-          {% elif post.file_ext == 'docx' or post.file_ext == 'doc' %}
-            <i class="fas fa-file-word"></i>
-          {% else %}
-            <i class="far fa-file"></i>
-          {% endif %}
-          {{ post.get_file_name }}
-        </a>
-        {% endif %}
-        <hr>
-
-        <!-- Comments Form -->
-        <div class="card my-4">
-          <h5 class="card-header">Leave a Comment:</h5>
-          <div class="card-body">
-            <form>
-              <div class="form-group">
-                <textarea class="form-control" rows="3"></textarea>
-              </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
-          </div>
-        </div>
-
-        <!-- Single Comment -->
-        <div class="media mb-4">
-          <img class="d-flex mr-3 rounded-circle" src="ttp://placehold.it/50x50h" alt="">
-          <div class="media-body">
-            <h5 class="mt-0">Commenter Name</h5>
-            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-          </div>
-        </div>
-
-        <!-- Comment with nested comments -->
-        <div class="media mb-4">
-          <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-          <div class="media-body">
-            <h5 class="mt-0">Commenter Name</h5>
-            Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-
-            <div class="media mt-4">
-              <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-              <div class="media-body">
-                <h5 class="mt-0">Commenter Name</h5>
-                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              </div>
-            </div>
-
-            <div class="media mt-4">
-              <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
-              <div class="media-body">
-                <h5 class="mt-0">Commenter Name</h5>
-                Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-              </div>
-            </div>
-
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Sidebar Widgets Column -->
-      <div class="col-md-4">
-
-        <!-- Search Widget -->
-        <div class="card my-4">
-          <h5 class="card-header">Search</h5>
-          <div class="card-body">
-            <div class="input-group">
-              <input type="text" class="form-control" placeholder="Search for...">
-              <span class="input-group-append">
-                <button class="btn btn-secondary" type="button">Go!</button>
-              </span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Categories Widget -->
-        <div class="card my-4">
-          <h5 class="card-header">Categories</h5>
-          <div class="card-body">
-            <div class="row">
-              <div class="col-lg-6">
-                <ul class="list-unstyled mb-0">
-                  <li>
-                    <a href="#">Web Design</a>
-                  </li>
-                  <li>
-                    <a href="#">HTML</a>
-                  </li>
-                  <li>
-                    <a href="#">Freebies</a>
-                  </li>
-                </ul>
-              </div>
-              <div class="col-lg-6">
-                <ul class="list-unstyled mb-0">
-                  <li>
-                    <a href="#">JavaScript</a>
-                  </li>
-                  <li>
-                    <a href="#">CSS</a>
-                  </li>
-                  <li>
-                    <a href="#">Tutorials</a>
-                  </li>
-                </ul>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Side Widget -->
-        <div class="card my-4">
-          <h5 class="card-header">Side Widget</h5>
-          <div class="card-body">
-            You can put anything you want inside of these side widgets. They are easy to use, and feature the new Bootstrap 4 card containers!
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-    <!-- /.row -->
-
   </div>
-  <!-- /.container -->
 
-  <!-- Footer -->
-  <footer class="py-5 bg-dark">
-    <div class="container">
-      <p class="m-0 text-center text-white">Copyright &copy; Your Website 2020</p>
+  <!-- Single Comment -->
+  <div class="media mb-4">
+    <img class="d-flex mr-3 rounded-circle" src="ttp://placehold.it/50x50h" alt="">
+    <div class="media-body">
+      <h5 class="mt-0">Commenter Name</h5>
+      Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
     </div>
-    <!-- /.container -->
-  </footer>
+  </div>
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="vendor/jquery/jquery.min.js"></script>
-  <script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- CSS only -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-giJF6kkoqNQ00vy+HMDP7azOuL0xtbfIcaT9wjKHr8RbDVddVHyTfAAsrekwKmP1" crossorigin="anonymous">
-<!-- JavaScript Bundle with Popper -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-ygbV9kiqUc6oa4msXn9868pTtWMgiQaeYH7/t7LECLbyPA2x65Kgf80OJFdroafW" crossorigin="anonymous"></script>
+  <!-- Comment with nested comments -->
+  <div class="media mb-4">
+    <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+    <div class="media-body">
+      <h5 class="mt-0">Commenter Name</h5>
+      Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
 
-</body>
+      <div class="media mt-4">
+        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+        <div class="media-body">
+          <h5 class="mt-0">Commenter Name</h5>
+          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+        </div>
+      </div>
 
-</html>
+      <div class="media mt-4">
+        <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+        <div class="media-body">
+          <h5 class="mt-0">Commenter Name</h5>
+          Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% endblock %}
