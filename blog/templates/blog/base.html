@@ -34,7 +34,7 @@
                             <ul class="list-unstyled mb-0">
                                 {% for category in Categories %}
                                 <li>
-                                    <a href="{{ category.get_absolute_url }}">{{ category }} ({{category.post_set.count }})</a>
+                                    <a href="{{ category.get_absolute_path }}">{{ category }} ({{category.post_set.count }})</a>
                                 </li>
                                 {% endfor %}
                                 <li>
