@@ -7,93 +7,95 @@
 {% block main_area %}
 
 <div id="post-area">
-  {% if post.category %}
-  <span class="badge badge-secondary float-right">{{ post.category }}</span>
-  {% else %}
-  <span class="badge badge-secondary float-right">미분류</span>
-  {% endif %}
-  <!-- Title -->
-  <h1 class="mt-4">{{ post.title }}</h1>
-  {% if post.hook_text %}
-  <h5 class="Text-muted">{{post.hook_text}}</h5>
-  {% endif %}
-
+    {% if post.category %}
+        <span class="badge badge-secondary float-right">{{ post.category }}</span>
+    {% else %}
+        <span class="badge badge-secondary float-right">미분류</span>
+    {% endif %}
+    <!-- Title -->
+    <h1 class="mt-4">{{ post.title }}</h1>
+    {% if post.hook_text %}
+        <h5 class="Text-muted">{{post.hook_text}}</h5>
+    {% endif %}
   <!-- Author -->
-  <p class="lead">
+    <p class="lead">
     by
-    <a href="#">{{ post.author | upper }}</a>
-  </p>
-
-  <hr>
+        <a href="#">{{ post.author | upper }}</a>
+    </p>
+    <hr>
     {% if user.is_authenticated and user == post.author %}
         <a class="btn btn-info btn-sm float-right" href="/blog/update_post/{{ post.pk }}/" role="button">
             <i class="fas fa-pen"></i> Edit Post</a>
     {% endif %}˚
-  <!-- Date/Time -->
-  <p>Posted on {{ post.created_at }}</p>
-
-  <hr>
-
+    <!-- Date/Time -->
+    <p>Posted on {{ post.created_at }}</p>
+    <hr>
     <!-- Preview Image -->
     {% if post.head_image %}
-    <img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="">
+        <img class="img-fluid rounded" src="{{ post.head_image.url }}" alt="">
     {% else %}
-    <img class="card-img-top"  src="http://picsum.photos/seed/{{post.id}}/800/200" alt="random_image">
+        <img class="card-img-top"  src="http://picsum.photos/seed/{{post.id}}/800/200" alt="random_image">
     {% endif %}
-
+    <!-- Post Content -->
     <p>{{ post.get_content_markdown | safe }}</p>
     {% if post.tags.exists %}
-      <i class="fas fa-tags"></i>
-      {% for tag in post.tags.all %}
+        <i class="fas fa-tags"></i>
+    {% for tag in post.tags.all %}
         <a href="{{ tag.get_absolute_url }}" class="badge badge-light">{{ tag }}</a>
-      {% endfor %}
+    {% endfor %}
     <br />
     <br />
     {% endif %}
-  <hr>
+    <hr>
+    {% if post.file_upload %}
+        <a href="{{ post.file_upload.url }}" class="btn btn-outline-dark" role="button">
+            Download:
+            {% if post.get_file_ext == 'csv' %}
+                <i class="fas fa-file-csv"></i>
+            {% elif post.file_ext == 'xlsx' or post.file_ext == 'xls' %}
+                <i class="fas fa-file-excel"></i>
+            {% elif post.file_ext == 'docx' or post.file_ext == 'doc' %}
+                <i class="fas fa-file-word"></i>
+            {% else %}
+                <i class="far fa-file"></i>
+            {% endif %}
+            {{ post.get_file_name }}
+        </a>
+    {% endif %}
 </div>
-<div id="comment-area">
-  <!-- Post Content -->
-  {% if post.file_upload %}
-  <a href="{{ post.file_upload.url }}" class="btn btn-outline-dark" role="button">
-    Download:
-    {% if post.get_file_ext == 'csv' %}
-      <i class="fas fa-file-csv"></i>
-    {% elif post.file_ext == 'xlsx' or post.file_ext == 'xls' %}
-      <i class="fas fa-file-excel"></i>
-    {% elif post.file_ext == 'docx' or post.file_ext == 'doc' %}
-      <i class="fas fa-file-word"></i>
-    {% else %}
-      <i class="far fa-file"></i>
-    {% endif %}
-    {{ post.get_file_name }}
-  </a>
-  {% endif %}
-  <hr>
-
+<hr>
+<div class="comment-area" id="comment-area">
   <!-- Comments Form -->
-  <div class="card my-4">
-    <h5 class="card-header">Leave a Comment:</h5>
-    <div class="card-body">
-      <form>
-        <div class="form-group">
-            <label>
-                <textarea class="form-control" rows="3"></textarea>
-            </label>
+    <div class="card my-4">
+        <h5 class="card-header">Leave a Comment:</h5>
+        <div class="card-body">
+            <form>
+                <div class="form-group">
+                    <label>
+                        <textarea class="form-control" rows="3"></textarea>
+                    </label>
+                </div>
+            <button type="submit" class="btn btn-primary">Submit</button>
+            </form>
         </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
-      </form>
     </div>
-  </div>
+  {% if post.comment_set.exists %}
+      {% for comment in post.comment_set.iterator %}
+          <!-- Single Comment -->
+          <div class="media mb-4" id="comment-{{ comment.pk }}">
+            <img class="d-flex mr-3 rounded-circle" src="http://placehold.it/50x50" alt="">
+            <div class="media-body">
+                <h5 class="mt-0">{{ comment.author.username }}&nbsp;&nbsp;
+                    <small class="text-muted">{{ comment.created_at }}</small>
+                </h5>
+                <p>{{ comment.content | linebreaks }}</p>
+            </div>
+          </div>
+      {% endfor %}
+  {% endif %}
+</div>
+<hr />
 
-  <!-- Single Comment -->
-  <div class="media mb-4">
-    <img class="d-flex mr-3 rounded-circle" src="ttp://placehold.it/50x50h" alt="">
-    <div class="media-body">
-      <h5 class="mt-0">Commenter Name</h5>
-      Cras sit amet nibh libero, in gravida nulla. Nulla vel metus scelerisque ante sollicitudin. Cras purus odio, vestibulum in vulputate at, tempus viverra turpis. Fusce condimentum nunc ac nisi vulputate fringilla. Donec lacinia congue felis in faucibus.
-    </div>
-  </div>
 
   <!-- Comment with nested comments -->
   <div class="media mb-4">
@@ -120,6 +122,5 @@
 
     </div>
   </div>
-</div>
 
 {% endblock %}
