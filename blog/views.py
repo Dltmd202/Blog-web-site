@@ -3,8 +3,11 @@ from django.views.generic import ListView, DetailView, CreateView, UpdateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.exceptions import PermissionDenied
 from django.utils.text import slugify
+from django.shortcuts import get_object_or_404
+from .forms import CommentForm
 
 from .models import Post, Category, Tag
+
 
 # Create your views here.
 
@@ -27,6 +30,7 @@ class PostDetail(DetailView):
         context = super(PostDetail, self).get_context_data()
         context['Categories'] = Category.objects.all()
         context['no_category_post_count'] = Post.objects.filter(category=None).count()
+        context['comment_form'] = CommentForm
         return context
 
 
@@ -88,7 +92,7 @@ class PostCreate(LoginRequiredMixin, UserPassesTestMixin, CreateView):
 
                 for t in tags_list:
                     t = t.strip()
-                    tag, is_tag_created = Tag.objects.get_or_create(name = t)
+                    tag, is_tag_created = Tag.objects.get_or_create(name=t)
                     if is_tag_created:
                         tag.slug = slugify(t, allow_unicode=True)
                         tag.save()
@@ -131,9 +135,27 @@ class PostUpdate(LoginRequiredMixin, UpdateView):
 
             for t in tags_list:
                 t = t.strip()
-                tag, is_tag_created = Tag.objects.get_or_create(name = t)
+                tag, is_tag_created = Tag.objects.get_or_create(name=t)
                 if is_tag_created:
                     tag.slug = slugify(t, allow_unicode=True)
                     tag.save()
                 self.object.tags.add(tag)
         return response
+
+
+def new_comment(request, pk):
+    if request.user.is_authenticated:
+        post = get_object_or_404(Post, pk=pk)
+
+        if request.method == 'POST':
+            comment_form = CommentForm(request.POST)
+            if comment_form.is_valid():
+                comment = comment_form.save(commit=False)
+                comment.post = post
+                comment.author = request.user
+                comment.save()
+                return redirect(comment.get_absolute_url())
+        else:
+            return redirect(post.get_absolute_url())
+    else:
+        raise PermissionDenied

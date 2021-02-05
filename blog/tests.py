@@ -45,8 +45,8 @@ class TestView(TestCase):
 
         self.comment_001 = Comment.objects.create(
             post=self.post_001,
-            author = self.user_Kim,
-            content = '첫 번째 댓글입니다.'
+            author=self.user_Kim,
+            content='첫 번째 댓글입니다.'
         )
 
     def test_tag_page(self):
@@ -184,7 +184,6 @@ class TestView(TestCase):
         self.assertIn(self.comment_001.author.username, comment_001_area.text)
         self.assertIn(self.comment_001.content, comment_001_area.text)
 
-
     def test_create_post(self):
         response = self.client.get('/blog/create_post/')
         self.assertNotEqual(response.status_code, 200)
@@ -240,11 +239,11 @@ class TestView(TestCase):
             username=self.user_Kim.username,
             password='kimimimi'
         )
-        response =self.client.get(update_post_url)
+        response = self.client.get(update_post_url)
         self.assertEqual(response.status_code, 200)
         soup = BeautifulSoup(response.content, 'html.parser')
 
-        self.assertEqual('Edit Post - Blog',soup.title.text)
+        self.assertEqual('Edit Post - Blog', soup.title.text)
         main_area = soup.find('div', id="main-area")
         self.assertIn('Edit Post', main_area.text)
 
@@ -252,14 +251,13 @@ class TestView(TestCase):
         self.assertTrue(tag_str_input)
         self.assertIn('파이썬 공부; python', tag_str_input.attrs['value'])
 
-
         response = self.client.post(
             update_post_url,
             {
-                'title' : '세 번째 포스트를 수정했습니다.',
-                'content' : '안녕 세계?',
-                'category' : self.category_music.pk,
-                'tags_str' : '파이썬 공부; 한글 태그, some tag'
+                'title': '세 번째 포스트를 수정했습니다.',
+                'content': '안녕 세계?',
+                'category': self.category_music.pk,
+                'tags_str': '파이썬 공부; 한글 태그, some tag'
             },
             follow=True
         )
@@ -270,5 +268,49 @@ class TestView(TestCase):
         self.assertIn(self.category_music.name, main_area.text)
         self.assertIn('파이썬 공부', main_area.text)
         self.assertIn('한글 태그', main_area.text)
-        self.assertIn('some tag',main_area.text)
+        self.assertIn('some tag', main_area.text)
         self.assertNotIn('python', main_area.text)
+
+    def test_comment_form(self):
+        self.assertEqual(Comment.objects.count(), 1)
+        self.assertEqual(self.post_001.comment_set.count(), 1)
+
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertIn('Log in and leave a comment', comment_area.text)
+        self.assertFalse(comment_area.find('form', id='comment-form'))
+
+        self.client.login(username='Kim', password='kimimimi')
+        response = self.client.get(self.post_001.get_absolute_url())
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, 'html.parser')
+
+        comment_area = soup.find('div', id='comment-area')
+        self.assertNotIn('Log in and leave a comment', comment_area.text)
+
+        comment_form = comment_area.find('form', id='comment-form')
+        self.assertTrue(comment_form.find('textarea', id='id_content'))
+        response = self.client.post(
+            self.post_001.get_absolute_url() + 'new_comment/',
+            {
+                'content':"Kim's comment",
+            },
+            follow=True
+        )
+        self.assertEqual(response.status_code, 200)
+
+        self.assertEqual(Comment.objects.count(), 2)
+        self.assertEqual(self.post_001.comment_set.count(), 2)
+
+        new_comment = Comment.objects.last()
+
+        soup = BeautifulSoup(response.content, 'html.parser')
+        self.assertIn(new_comment.post.title, soup.title.text)
+
+        comment_area = soup.find('div', id='comment-area')
+        new_comment_div = comment_area.find('div', id=f'comment-{new_comment.pk}')
+        self.assertIn('Kim', new_comment_div.text)
+        self.assertIn("Kim's comment", new_comment_div.text)
