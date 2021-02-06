@@ -6,7 +6,7 @@ from django.utils.text import slugify
 from django.shortcuts import get_object_or_404
 from .forms import CommentForm
 
-from .models import Post, Category, Tag
+from .models import Post, Category, Tag, Comment
 
 
 # Create your views here.
@@ -159,3 +159,14 @@ def new_comment(request, pk):
             return redirect(post.get_absolute_url())
     else:
         raise PermissionDenied
+
+
+class CommentUpdate(LoginRequiredMixin, UpdateView):
+    model = Comment
+    form_class = CommentForm
+
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated and request.user == self.get_object().author:
+            return super(CommentUpdate, self).dispatch(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
