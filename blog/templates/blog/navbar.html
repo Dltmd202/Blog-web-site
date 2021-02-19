@@ -29,7 +29,14 @@
                 <li class="nav-item dropdown">
                       <a class="nav-link dropdown-toggle" role="button" id="dropdownMenuButton" href="#"
                          data-bs-toggle="dropdown" aria-expanded="false">
-                        {{ user.username }}
+                          {% if user.socialaccount_set.all.0.get_avatar_url %}
+                              <img class="rounded-circle" width="25px" src="{{ user.socialaccount_set.all.0.get_avatar_url }}"
+                                   alt="">
+                              {% else %}
+                              <img class="rounded-circle" src="https://'http://placehold.it/25x25">
+                              {% endif %}
+                      &nbsp;
+                          {{ user.username }}
                       </a>
                          <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                              <li><a class="dropdown-item" href="/accounts/logout/">Log Out</a></li>
